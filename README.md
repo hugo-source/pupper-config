@@ -1,0 +1,2 @@
+# pupper-config
+Pupper configuration
