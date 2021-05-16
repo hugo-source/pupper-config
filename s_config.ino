@@ -34,6 +34,7 @@ const char leg_pos[4][16] = { "front-right", "front-left", "back-right", "back-l
 void setup() {
   Serial.begin(115200); // usb serial
   digitalWrite( LED_BUILTIN, HIGH );
+  delay( 1000 );
   hardware_interface.state = &state;
   hardware_interface.Config = &Config;
   hardware_interface.init_servos();
@@ -43,7 +44,8 @@ void setup() {
   Serial.print( "This value is currently set to: " ); Serial.println( degrees_to_radians( Config.ServoParams.micros_per_rad ), 3 );
   Serial.println("For newer CLS6336 and CLS6327 servos the value should be 11.333.");
 
-  Serial.println( "Press RETURN to start calibration." ); 
+  Serial.println( "Press RETURN to start calibration." );
+  Serial.println( "" ); 
 };
 
 void loop() {
