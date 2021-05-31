@@ -104,7 +104,10 @@ void loop() {
       }; // end for
     }; // end for
     Serial.println( "Finished calibration." ); // response
-    PrintMatrix( (float*)Config.ServoParams.neutral_angle_degrees, 3, 4, "neutral_angle_degrees" );
+    for ( int leg_index=0; leg_index<4; leg_index++ ) 
+      for ( int axis=0; axis<3; axis++ ) 
+        Serial.printf( "leg %d, axis %d %f\n", leg_index, axis, Config.ServoParams.neutral_angle_degrees[axis][leg_index] );
+    //PrintMatrix( (float*)Config.ServoParams.neutral_angle_degrees, 3, 4, "neutral_angle_degrees" );
   };
 };
     
@@ -127,18 +130,20 @@ float step_until( int16_t axis, int16_t leg, float set_point )
     Serial.println( move_input );  
     while ( not Serial.available() ); //wait
     comdata = Serial.readStringUntil( '\n' );
-    char cmd = comdata.charAt( 0 );
-    if ( cmd == 'a' ) {
-      offset += 1.0;
-      hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
-    };
-    if ( cmd == 'b' ) {
-      offset -= 1.0;
-      hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
-    };
-    if ( cmd == 'd' ) {
-      Serial.print( "Offset: " ); Serial.println( offset );
-      break;
+    if ( comdata.length() > 0 ) {
+      char cmd = comdata.charAt( 0 );
+      if ( cmd == 'a' ) {
+        offset += 1.0;
+        hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
+      };
+      if ( cmd == 'b' ) {
+        offset -= 1.0;
+        hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
+      };
+      if ( cmd == 'd' ) {
+        Serial.print( "Offset: " ); Serial.println( offset );
+        break;
+      };
     };
   };
   return offset;

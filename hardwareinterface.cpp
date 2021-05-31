@@ -42,6 +42,7 @@ void HardwareInterface::set_actuator_position( float joint_angle, int16_t axis, 
 int32_t HardwareInterface::__duty_cycle( int32_t m )
 {
   // Servos won't respond to a duty cycle > 2100 
+  if ( ( m < 800 ) or ( m > 2100 ) ) Serial.printf( "Range error %d\n", m );
   m = constrain( m, 800, 2100 );
   int32_t dc = m * Config->PWMparams.range * Config->PWMparams.freq / 1e6;
   return dc; 
