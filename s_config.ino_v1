@@ -38,15 +38,7 @@ void setup() {
   hardware_interface.state = &state;
   hardware_interface.Config = &Config;
   hardware_interface.init_servos();
-  delay( 1000 );
-  // Set legs at theoretical neutral angles
-  for ( int16_t leg_index=0; leg_index<4; leg_index++ )
-    for ( int16_t axis_index=0; axis_index<3; axis_index++ )
-      state.joint_angles.Legs[axis_index][leg_index] = 
-        Config.NEUTRAL_ANGLE_DEGREES[axis_index][leg_index] * M_PI / 180.0;
-  // Update the pwm widths going to the servos
-  hardware_interface.set_actuator_postions( );
-  delay( 1000 );
+
   Serial.println( "The scaling constant for your servo represents how much you have to increase" );
   Serial.println( "the pwm pulse width (in microseconds) to rotate the servo output 1 degree." );
   Serial.print( "This value is currently set to: " ); Serial.println( degrees_to_radians( Config.ServoParams.micros_per_rad ), 3 );
@@ -75,33 +67,33 @@ void loop() {
         while ( not completed ) {
           sprintf( motor_descrip, "Calibrating the **%s %s motor",  motor_type[axis], leg_pos[leg_index] );
           Serial.println( motor_descrip );
-          /*
+          
           float set_point = set_points[axis][leg_index];
           // Zero out the neutral angle
           Config.ServoParams.neutral_angle_degrees[axis][leg_index] = 0;
 
           // Move servo to set_point angle
           hardware_interface.set_actuator_position( degrees_to_radians( set_point ), axis, leg_index );
-*/
+
           // Adjust the angle using keyboard input until it matches the reference angle
-          float offset = step_until( axis, leg_index );
+          float offset = step_until( axis, leg_index, set_point );
 
           Serial.print( "Final offset: " ); Serial.println( offset );
-/*
+
           // The upper leg link has a different equation because we're calibrating to make it horizontal, not vertical
           if ( axis == 1 ) {
             Config.ServoParams.neutral_angle_degrees[axis][leg_index] = set_point - offset;
           } else {
             Config.ServoParams.neutral_angle_degrees[axis][leg_index] = -(set_point + offset);
-          }; */
+          };
           Serial.print( "Calibrated neutral angle: " ); 
           Serial.println( Config.ServoParams.neutral_angle_degrees[axis][leg_index] );
 
           // Send the servo command using the new beta value and check that it's ok
-          //float n[3] = { 0, 45, -45 };
+          float n[3] = { 0, 45, -45 };
           const char txt[3][16] = { "horizontal", "45 degrees", "45 degrees" };
           char prompt[32];
-          //hardware_interface.set_actuator_position( degrees_to_radians( n[axis] ), axis, leg_index );
+          hardware_interface.set_actuator_position( degrees_to_radians( n[axis] ), axis, leg_index );
           sprintf( prompt, "The leg should be at exactly **%s**. Are you satisfied? Enter 'y' or 'n to repeat'", txt[axis] );
           Serial.println( prompt );  
           while ( not Serial.available() ); //wait
@@ -112,9 +104,9 @@ void loop() {
       }; // end for
     }; // end for
     Serial.println( "Finished calibration." ); // response
-//    for ( int leg_index=0; leg_index<4; leg_index++ ) 
-//      for ( int axis=0; axis<3; axis++ ) 
-//        Serial.printf( "leg %d, axis %d %f\n", leg_index, axis, Config.ServoParams.neutral_angle_degrees[axis][leg_index] );
+    //for ( int leg_index=0; leg_index<4; leg_index++ ) 
+    //  for ( int axis=0; axis<3; axis++ ) 
+    //    Serial.printf( "leg %d, axis %d %f\n", leg_index, axis, Config.ServoParams.neutral_angle_degrees[axis][leg_index] );
     PrintMatrix( (float*)Config.ServoParams.neutral_angle_degrees, 3, 4, "neutral_angle_degrees" );
   };
 };
@@ -128,7 +120,7 @@ void loop() {
         Angle offset needed to correct the link.
     """
 */
-float step_until( int16_t axis, int16_t leg_index )
+float step_until( int16_t axis, int16_t leg, float set_point )
 {
   char set_names[3][16] = { "horizontal", "horizontal", "vertical" };
   char move_input[80];
@@ -142,19 +134,14 @@ float step_until( int16_t axis, int16_t leg_index )
       char cmd = comdata.charAt( 0 );
       if ( cmd == 'a' ) {
         offset += 1.0;
-        Config.ServoParams.neutral_angle_degrees[axis][leg_index] += 1;
-        hardware_interface.set_actuator_postions( );
-        //hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
+        hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
       };
       if ( cmd == 'b' ) {
         offset -= 1.0;
-        Config.ServoParams.neutral_angle_degrees[axis][leg_index] -= 1;
-        hardware_interface.set_actuator_postions( );
-        //hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
+        hardware_interface.set_actuator_position( degrees_to_radians( set_point + offset ), axis, leg );
       };
       if ( cmd == 'd' ) {
-//        Serial.print( "Offset: " ); Serial.println( offset );
-        Serial.printf( "Adjusted joint angle: %f\n", Config.ServoParams.neutral_angle_degrees[axis][leg_index] );
+        Serial.print( "Offset: " ); Serial.println( offset );
         break;
       };
     };

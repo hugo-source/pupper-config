@@ -51,7 +51,7 @@ int32_t HardwareInterface::__duty_cycle( int32_t m )
 void HardwareInterface::set_PWM_duty_cycle( int16_t axis, int16_t leg, int32_t duty_cycle )
 {
   analogWrite( Config->PWMparams.pins[axis][leg], __duty_cycle( duty_cycle ) );
-  Serial.printf( "set_PWM_duty_cycle=%d\n", duty_cycle ); 
+  //Serial.printf( "set_PWM_duty_cycle=%d\n", duty_cycle ); 
 //  Serial.print( ", axis/leg=" ); Serial.print( axis ); Serial.println( leg ); 
 };
 
@@ -147,8 +147,8 @@ int32_t HardwareInterface::angle_to_pwm( float joint_angle, int16_t axis_index, 
                             Config->ServoParams.servo_multipliers[axis_index][leg_index];
   float pulse_width_micros = ( Config->ServoParams.neutral_position_pwm + 
                                Config->ServoParams.micros_per_rad * angle_deviation );
-  Serial.print( "angle_deviation=" ); Serial.println( angle_deviation );
-  Serial.print( "PWM micros=" ); Serial.println( pulse_width_micros );
+  //Serial.print( "angle_deviation=" ); Serial.println( angle_deviation );
+  //Serial.print( "PWM micros=" ); Serial.println( pulse_width_micros );
   
   return pulse_width_micros;
 };

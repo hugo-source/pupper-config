@@ -20,7 +20,7 @@ class Configuration {
       {2, 5, 8, 9}
     };
     int32_t range = 4000;
-    int16_t freq = 250; 
+    int16_t freq = 250;
   } PWMparams;
 
   // MICROS_PER_RAD and NEUTRAL_ANGLE_DEGREES should be determined by calibration
@@ -36,10 +36,15 @@ class Configuration {
     float micros_per_rad = MICROS_PER_RAD; // Must be calibrated
 
     // The neutral angle of the joint relative to the modeled zero-angle in degrees, for each joint
+//    float neutral_angle_degrees[3][4] = {
+//      {  0.0,  0.0,  0.0,  0.0},
+//      { 45.0, 45.0, 45.0, 45.0},
+//      {-45.0,-45.0,-45.0,-45.0}
+//    };
     float neutral_angle_degrees[3][4] = {
-      {  0.0,  0.0,  0.0,  0.0},
-      { 45.0, 45.0, 45.0, 45.0},
-      {-45.0,-45.0,-45.0,-45.0}
+      {  7.0,  -6.0,  1.0,  4.0},
+      { 44.0, 43.0, 46.0, 39.0},
+      {-48.0,-44.0,-53.0,-49.0}
     };
 
     int16_t servo_multipliers[3][4] {
@@ -79,6 +84,8 @@ class Configuration {
     const float max_yaw_rate = 2.0;
     const float max_pitch = 30.0 * M_PI / 180.0;
         
+    const float max_roll = 30.0 * M_PI / 180.0;
+
     //#################### MOVEMENT PARAMS ####################
     const float z_time_constant = 0.02;
     const float z_speed = 0.03;  // maximum speed [m/s]
